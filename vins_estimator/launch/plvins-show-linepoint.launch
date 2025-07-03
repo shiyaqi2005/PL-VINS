@@ -1,6 +1,8 @@
 <launch>
     <arg name="config_path" default = "$(find feature_tracker)/../config/euroc/loop.yaml" />
 	  <arg name="vins_path" default = "$(find feature_tracker)/../config/../" />
+	  <arg name="camera_config_path" default="$(find feature_tracker)/../config/euroc/euroc_config_fix_extrinsic.yaml" />
+
 
     <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plvins_estimator)/../config/vins_rviz_config.rviz" />
 
@@ -27,7 +29,9 @@
         <param name="skip_dis" type="double" value="0" />
     </node>
 
-    <node name="image_node_b" pkg="image_node_b" type="image_node_b" output="log">
+    <node name="image_node_b" pkg="image_node_b" type="image_node_b" output="screen">
+        <param name="camera_config_file" type="string" value="$(arg camera_config_path)" />
+        <!-- Add other required parameters if needed -->
     </node>   
 </launch>
 

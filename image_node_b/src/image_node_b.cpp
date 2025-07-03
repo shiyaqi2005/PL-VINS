@@ -75,11 +75,43 @@ void callback(const sensor_msgs::PointCloudConstPtr &point_feature_msg,
 
 int main(int argc, char **argv) {
 
-  m_camera = camodocal::CameraFactory::instance()->generateCameraFromYamlFile("/../../config/euroc/euroc_config_fix_extrinsic.yaml");
-  K_ = m_camera->initUndistortRectifyMap(undist_map1_,undist_map2_);  
+  //m_camera = camodocal::CameraFactory::instance()->generateCameraFromYamlFile("/catkin_plvins/src/config/euroc/euroc_config_fix_extrinsic.yaml");
+  //K_ = m_camera->initUndistortRectifyMap(undist_map1_,undist_map2_);  
 
   ros::init(argc, argv, "sync_control_node"); 
-  ros::NodeHandle nh;                      
+  ros::NodeHandle nh;   
+  
+  std::string camera_config_path;
+  
+
+// Get parameter from the correct namespace
+if (!nh.getParam("/image_node_b/camera_config_file", camera_config_path)) {
+    ROS_ERROR("Failed to get /image_node_b/camera_config_file parameter! Using default path.");
+    camera_config_path = "/catkin_plvins/src/config/euroc/euroc_config_fix_extrinsic.yaml";
+}
+
+// Verify file exists
+std::ifstream config_test(camera_config_path);
+if (!config_test) {
+    ROS_FATAL("Camera config file missing or inaccessible at: %s", camera_config_path.c_str());
+    
+    // Debug: List directory contents
+    ROS_INFO("Contents of /catkin_plvins/src/config/euroc/:");
+    std::string ls_cmd = "ls -la " + camera_config_path.substr(0, camera_config_path.find_last_of('/'));
+    system(ls_cmd.c_str());
+    
+    return -1;
+}
+
+// Load camera config
+try {
+    m_camera = camodocal::CameraFactory::instance()->generateCameraFromYamlFile(camera_config_path);
+    ROS_INFO("Successfully loaded camera config from: %s", camera_config_path.c_str());
+} catch (const std::exception& e) {
+    ROS_FATAL("Camera config load failed: %s", e.what());
+    return -1;
+}
+
 
   message_filters::Subscriber<sensor_msgs::PointCloud> point_feature_sub(nh, "/feature_tracker/feature",1000); 
   message_filters::Subscriber<sensor_msgs::PointCloud> line_feature_sub(nh, "/linefeature_tracker/linefeature", 1000);

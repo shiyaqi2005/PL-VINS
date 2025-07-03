@@ -5,7 +5,7 @@
 extern int ROW;
 extern int COL;
 extern int FOCAL_LENGTH;
-const int NUM_OF_CAM = 1;
+const int NUM_OF_CAM = 2;
 
 
 extern std::string IMAGE_TOPIC;

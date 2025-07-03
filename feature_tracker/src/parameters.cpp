@@ -45,7 +45,9 @@ void readParameters(ros::NodeHandle &n)
     }
     std::string VINS_FOLDER_PATH = readParam<std::string>(n, "vins_folder");
 
-    fsSettings["image_topic"] >> IMAGE_TOPIC;
+    fsSettings["image0_topic"] >> IMAGE0_TOPIC;
+    fsSettings["image1_topic"] >> IMAGE1_TOPIC;
+
     fsSettings["imu_topic"] >> IMU_TOPIC;
     MAX_CNT = fsSettings["max_cnt"];
     MIN_DIST = fsSettings["min_dist"];
@@ -58,7 +60,11 @@ void readParameters(ros::NodeHandle &n)
     FISHEYE = fsSettings["fisheye"];
     if (FISHEYE == 1)
         FISHEYE_MASK = VINS_FOLDER_PATH + "config/fisheye_mask.jpg";
-    CAM_NAMES.push_back(config_file);
+
+    CAM0 = fsSettings["cam0_calib"];
+    CAM_NAMES.push_back(CAM0);
+    CAM1 = fsSettings["cam1_calib"];
+    CAM_NAMES.push_back(CAM1);
 
     WINDOW_SIZE = 20;
     STEREO_TRACK = false;
